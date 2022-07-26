@@ -1,73 +1,157 @@
+// See all ramen images in the `div` with the id of `ramen-menu`. When the page
+// loads, request the data from the server to get all 
+//the ramen objects. 
+//Then, display the image for each of the ramen using an `img` tag inside the
+// `#ramen-menu` div.
 
-//  !!!i failed so i just wrote comments to the solution to try to understand
+const baseUrl = 'http://localhost:3000/ramens'
+const ramenMenu = document.getElementById('ramen-menu')
+const ramenComment = document.getElementById('comment-display')
+const ramenRating = document.getElementById('rating-display')
+const ramenImage = document.getElementById('detail-image')
+const ramenName = document.getElementById('name')
+const ramenRestaurant = document.getElementById('restaurant')
 
-// fetch the data from the server (frrom the website)
-function fetchRamen(){
-    fetch('http://localhost:4000/ramens')
-    .then(response => response.json())
-    .then(data => {
-        console.log(data)
-        renderRamens(data)
-    })
+const fetchData = () => {
+    fetch(baseUrl)
+        .then(req => req.json())
+        .then(res => {
+            res.forEach(obj => {
+                ramenObject(obj) // invoking the function to render for each
+
+            })
+        });
 }
 
-// i think the async method makes more sense i dont understand this at all 
+// abstraction passes in the object as a parameter 
+let ramenObject = (obj) => {
+    const imgDiv = document.createElement('div') // create a div to hold the ramen image and delete button
+    const img = document.createElement('img')
+    img.src = obj.image
+    const deleteButton = document.createElement('button')
+    deleteButton.innerText = 'Delete'
+    imgDiv.append(img, deleteButton) // append img and delete button to div
+    ramenMenu.append(imgDiv) // append div to ramen menu div
+    deleteButton.addEventListener('click', (e) => {
+        imgDiv.remove() // delete the div that contains the img and button on click
+    })
 
 
 
-fetchRamen()
 
-// create global variables of html tags , id names
+    img.addEventListener('click', (e) => {
+        ramenRating.innerText = obj.rating
+        ramenComment.innerText = obj.comment
+        ramenImage.src = obj.image
+        ramenName.textContent = obj.name
+        ramenRestaurant.textContent = obj.restaurant
 
-let menu = document.getElementById('ramen-menu')
 
-let image = document.createElement('img') //creating the image element 
 
-// making variabes from thee images  
-let ramenImage = document.querySelector('.detail-image') /
-let ramenName = document.querySelector('.name')
-let ramenRestaurant = document.querySelector('.restaurant')
-let ramenRating = document.getElementById('rating-display')
-let ramenComment = document.getElementById('comment-display')
+    })
+}
+fetchData()
 
-//making variables for the form 
-let ramenForm = document.getElementById('new-ramen')
-let newName = document.getElementById('new-name')
-let newRestaurant = document.getElementById('new-restaurant')
-let newImage = document.getElementById('new-image')
-let newComment = document.getElementById('new-comment')
-let newRating = document.getElementById('new-rating')
+/* Click on an image from the `#ramen-menu` div and see all the info about that
+// ramen displayed inside the `#ramen-detail` div and where it says
+// `insert comment here` and`insert rating here`.
 
-const renderRamens = (data) => {
-    console.log(data, " From the render function")
-    for (const item of data){
-        console.log(item)
-        let image = document.createElement('img')
-        image.src =  item.image
-        menu.append(image)
 
-        image.addEventListener('click', function(){
-            ramenImage.src = item.image
-            ramenName.innerHTML =`${item.name}`
-            ramenRestaurant.innerHTML = `${item.restaurant}`
-            ramenRating.innerHTML = item.rating
-            ramenComment.innerHTML =   item.comment
+// Create a new ramen after submitting the `new-ramen` form.The new ramen should
+// be added to the`#ramen-menu` div.The new ramen does not need to persist; in
+// other words, if you refresh the page, it's okay that the new ramen is no
+// longer on the page. */
+
+const form = document.getElementById('new-ramen')
+const inputName = document.getElementById('new-name')
+const inputRestaurant = document.getElementById('new-restaurant')
+const inputImage = document.getElementById('new-image')
+const inputRating = document.getElementById('new-rating')
+const inputComment = document.getElementById('new-comment')
+
+
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    let newObj = {}
+    newObj.name = inputName.value
+    newObj.restaurant = inputRestaurant.value
+    newObj.image = inputImage.value
+    newObj.rating = inputRating.value
+    newObj.comment = inputComment.value
+    ramenObject(newObj) // invoking the 
+
+
+})
+
+/* See the details for the first ramen as soon as the page loads (without
+ clicking on an image)
+- Update the rating and comment for a ramen by submitting a form. Changes should
+ be reflected on the frontend. No need to persist. You can add this HTML to the
+ `index.html` file to create the edit form: 
+
+ Delete a ramen (you can add a "delete" button if you'd like, or use an
+ existing element to handle the delete action). The ramen should be removed
+ from the `ramen-menu` div, and should not be displayed in the `ramen-detail`
+ div. No need to persist.*/
+
+//get ramendetail div in a fetch + 1
+
+const firstRamen = 'http://localhost:3000/ramens/1'
+
+const displayFirstRamen = () => {
+    fetch(firstRamen)
+        .then(req => req.json())
+        .then(obj => {
+            ramenRating.innerText = obj.rating
+            ramenComment.innerText = obj.comment
+            ramenImage.src = obj.image
+            ramenName.textContent = obj.name
+            ramenRestaurant.textContent = obj.restaurant
 
         })
-    }
 }
 
-const addNewRamen = () =>{
-    ramenForm.addEventListener('submit', function(e){
-        e.preventDefault()
-        ramenForm.reset()
-        console.log('Submitted')
-        console.log(newName.value)
-        let newRamen = [{"name": newName.value, "restaurant": newRestaurant.value, "image": newImage.value, "rating": newRating.value, "comment": newComment.value}]
-        console.log(newRamen, "   This is the new Object")
-        renderRamens(newRamen)
-    })
+displayFirstRamen()
+
+// POST CREATE SOMETHING THAT DOESNT EXIST ONTO JSON
+// DELETE // DELETES THE RAMENS ONTO SERVER
+// PATCH // UPDATE RAMEN RATING AND COMMENTS 
+
+
+
+
+/* POST REQ , 
+
+
+const postReq = await fetch(baseUrl)
+method: 'POST',
+headers: {'Content=Type': 'application/json'},
+body: JSON.stringify({newObj}) // didnt work 
+
+/*
+
+const postReq = () => {
+  fetch(baseUrl)
+  method: 'POST',
+  headers: {
+    'Content-type': 'application/json'
+
+  },
+  body: JSON.stringify(
+    {n }
+
 }
 
-addNewRamen()
+postReq()
 
+
+// DELETE REQ 
+const deleteReq = () => {
+   delete(baseUrl)
+   Method: 'DELETE',
+   headers: {
+    'Content-type': 'application/json'
+   }
+
+} */
